@@ -1,36 +1,43 @@
 import pandas as pd
 import pickle
-
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score
 
 df = pd.read_csv("area_prices_monthly.csv")
 
-# ONLY these columns
-X = df[['area_size', 'beds', 'baths']]
+# remove target
 y = df['secondary_price_per_sqft_usd']
 
-# Fill missing values
+# features (everything except target + optional leakage columns)
+X = df.drop(columns=[
+    'secondary_price_per_sqft_usd',
+    'secondary_price_per_m2_usd'
+])
+
+# handle categorical columns
+X = pd.get_dummies(X)
+
+# fill missing values
 X = X.fillna(X.mean())
 y = y.fillna(y.mean())
 
-# Split
+# split
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42
 )
 
-# Train model
+# model
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-# Accuracy
-y_pred = model.predict(X_test)
-print("R2 Score:", r2_score(y_test, y_pred))
+print("R2:", model.score(X_test, y_test))
 
-# Save NEW model
-pickle.dump(model, open('model.pkl', 'wb'))
+# save model
+pickle.dump(model, open("model.pkl", "wb"))
 
-print("NEW model saved")
+# IMPORTANT: save feature columns for frontend
+pickle.dump(X.columns, open("columns.pkl", "wb"))
+print("TRAINING STARTED")
 
 print(X.columns)
+print("Model trained successfully")
