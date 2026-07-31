@@ -16,14 +16,13 @@ X = df.drop(columns=[
 
 # handle categorical columns
 X = pd.get_dummies(X)
-
 # fill missing values
 X = X.fillna(X.mean())
 y = y.fillna(y.mean())
 
 # split
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42
+    X, y, test_size=0.2, random_state=42
 )
 
 # model
@@ -39,5 +38,6 @@ pickle.dump(model, open("model.pkl", "wb"))
 pickle.dump(X.columns, open("columns.pkl", "wb"))
 print("TRAINING STARTED")
 
-print(X.columns)
+# print(X.columns)
 print("Model trained successfully")
+print(X.head())
